@@ -4,33 +4,40 @@ import { calculateWinner } from './utils/calculateWinner'
 
 const App = () => {
 
-  const [board, setBoard] = useState(Array(9).fill(null))
-  const [isXNext, setIsXNext] = useState(false)
+  const [history, setHistory] = useState([{ board: Array(9).fill(null), isXNext: true }])
+  const [currentMove, setCurrentMove] = useState(0)
 
-  const winner = calculateWinner(board)
+  const current = history[currentMove]
 
-  const message = winner ? `Winner is ${winner}` : `Next player is ${isXNext ? 'X' : 'O'}`
+  const winner = calculateWinner(current.board)
+
+  const message = winner ? `Winner is ${winner}` : `Next player is ${current.isXNext ? 'X' : 'O'}`
 
   const handleSquareClick = (position) => {
 
-    if (board[position] || winner) {
+    if (current.board[position] || winner) {
       return
     }
 
-    setBoard(board.map((value, pos) => {
+    const newBoard = current.board.map((value, pos) => {
       if (pos === position) {
-        return isXNext ? 'X' : 'O'
+        return current.isXNext ? 'X' : 'O'
       }
       return value
-    }))
-    setIsXNext(!isXNext)
+    })
+
+    const newIsXNext = !current.isXNext
+
+    setHistory(history.concat({ board: newBoard, isXNext: newIsXNext }))
+
+    setCurrentMove(currentMove + 1)
   }
 
   return (
     <div className="App">
       <h1>Tic Tac Toe</h1>
       <h2>{message}</h2>
-      <Board board={board} handleSquareClick={handleSquareClick} />
+      <Board board={current.board} handleSquareClick={handleSquareClick} />
     </div>
   );
 }
